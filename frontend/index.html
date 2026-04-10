@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PredictIQ — Real-Time Customer Purchase Intelligence</title>
+  <meta name="description" content="ML-powered customer purchase behavior prediction with real-time segmentation, RFM analytics, and actionable insights." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="chart.min.js"></script>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════  SIDEBAR  ═══════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">PredictIQ</span>
+        <span class="brand-sub">Customer Intelligence</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="#" class="nav-item active" data-page="dashboard" onclick="navigate('dashboard',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item" data-page="segments" onclick="navigate('segments',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>
+        Segmentation
+      </a>
+      <a href="#" class="nav-item" data-page="predict" onclick="navigate('predict',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Prediction Engine
+      </a>
+      <a href="#" class="nav-item" data-page="live" onclick="navigate('live',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M6.3 6.3a8 8 0 0 0 0 11.31"/><path d="M17.7 6.3a8 8 0 0 1 0 11.31"/><path d="M3.5 3.5a13 13 0 0 0 0 17"/><path d="M20.5 3.5a13 13 0 0 1 0 17"/></svg>
+        Live Monitor
+        <span class="nav-badge pulse-dot"></span>
+      </a>
+      <div class="nav-section-label">Analytics</div>
+      <a href="#" class="nav-item" data-page="reports" onclick="navigate('reports',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Reports & Insights
+      </a>
+      <a href="#" class="nav-item" data-page="models" onclick="navigate('models',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Model Comparison
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="api-status" id="apiStatus">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Connecting…</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════  MAIN  ═══════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-title" id="topbarTitle">Dashboard Overview</div>
+      <div class="topbar-right">
+        <div class="last-updated" id="lastUpdated">–</div>
+        <button class="refresh-btn" onclick="refreshCurrentPage()" title="Refresh data">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ─── PAGE: DASHBOARD ─────────────────────────── -->
+    <main class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h1>Dashboard <span class="page-badge">Live</span></h1>
+        <p>Real-time overview of customer purchase intelligence metrics</p>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid" id="kpiGrid">
+        <div class="kpi-card" style="--accent:#6366f1">
+          <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpi-customers">–</div>
+            <div class="kpi-label">Total Customers</div>
+          </div>
+          <div class="kpi-trend up" id="kpi-customers-trend">↑ 12.4%</div>
+        </div>
+        <div class="kpi-card" style="--accent:#10b981">
+          <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpi-revenue">–</div>
+            <div class="kpi-label">Total Revenue</div>
+          </div>
+          <div class="kpi-trend up" id="kpi-revenue-trend">↑ 8.7%</div>
+        </div>
+        <div class="kpi-card" style="--accent:#f59e0b">
+          <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpi-freq">–</div>
+            <div class="kpi-label">Avg Order Frequency</div>
+          </div>
+          <div class="kpi-trend up">↑ 3.1%</div>
+        </div>
+        <div class="kpi-card" style="--accent:#ec4899">
+          <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpi-highval">–</div>
+            <div class="kpi-label">High-Value Customers</div>
+          </div>
+          <div class="kpi-trend up">↑ 5.9%</div>
+        </div>
+      </div>
+
+      <!-- Charts Row 1 -->
+      <div class="charts-row">
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Customer Segment Distribution</div>
+              <div class="chart-subtitle">RFM-based K-Means clustering breakdown</div>
+            </div>
+            <div class="chart-legend" id="segLegend"></div>
+          </div>
+          <div class="chart-wrap"><canvas id="segmentDonut"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Model Accuracy Rankings</div>
+              <div class="chart-subtitle">Top ML model performance</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="modelBar"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Charts Row 2 -->
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">RFM Scatter Plot</div>
+              <div class="chart-subtitle">Recency vs Monetary by segment</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="rfmScatter"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Avg Metrics by Segment</div>
+              <div class="chart-subtitle">Recency · Frequency · Monetary</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="segRadar"></canvas></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ─── PAGE: SEGMENTATION ──────────────────────── -->
+    <main class="page" id="page-segments">
+      <div class="page-header">
+        <h1>Customer Segmentation</h1>
+        <p>Deep-dive into ML-driven RFM customer clusters</p>
+      </div>
+
+      <div class="seg-overview" id="segOverview">
+        <!-- Segment cards will be injected -->
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Segment Comparison — Avg RFM Metrics</div>
+              <div class="chart-subtitle">Grouped bar chart across all 4 segments</div>
+            </div>
+          </div>
+          <div class="chart-wrap" style="height:300px"><canvas id="segGroupedBar"></canvas></div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">RFM Scatter — Segment Clusters</div>
+              <div class="chart-subtitle">Interactive bubble chart (Recency × Monetary × Frequency)</div>
+            </div>
+          </div>
+          <div class="chart-wrap" style="height:340px"><canvas id="segScatter2"></canvas></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ─── PAGE: PREDICTION ENGINE ────────────────── -->
+    <main class="page" id="page-predict">
+      <div class="page-header">
+        <h1>Prediction Engine</h1>
+        <p>Input customer RFM features and get real-time purchase probability</p>
+      </div>
+
+      <div class="predict-layout">
+        <!-- Form -->
+        <div class="predict-form-card">
+          <div class="form-section-title">Customer Features</div>
+          <form id="predictForm" onsubmit="runPrediction(event)">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="f-recency">Recency <span class="form-hint">(days since last purchase)</span></label>
+                <input type="number" id="f-recency" min="0" max="730" value="30" required />
+              </div>
+              <div class="form-group">
+                <label for="f-frequency">Frequency <span class="form-hint">(purchase count)</span></label>
+                <input type="number" id="f-frequency" min="1" max="500" value="12" required />
+              </div>
+              <div class="form-group">
+                <label for="f-spend">Total Spend <span class="form-hint">(₹)</span></label>
+                <input type="number" id="f-spend" min="0" max="500000" value="15000" required />
+              </div>
+              <div class="form-group">
+                <label for="f-aov">Avg Order Value <span class="form-hint">(₹)</span></label>
+                <input type="number" id="f-aov" min="0" max="50000" value="1250" required />
+              </div>
+              <div class="form-group">
+                <label for="f-products">Unique Products <span class="form-hint">(catalog breadth)</span></label>
+                <input type="number" id="f-products" min="1" max="200" value="8" required />
+              </div>
+              <div class="form-group">
+                <label for="f-qty">Avg Quantity <span class="form-hint">(per order)</span></label>
+                <input type="number" id="f-qty" min="1" max="50" step="0.1" value="2.5" required />
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="f-model">ML Model</label>
+              <div class="model-selector" id="modelSelector">
+                <div class="model-chip active" data-model="Random Forest" onclick="selectModel(this)">
+                  <span class="chip-dot" style="background:#6366f1"></span>Random Forest
+                </div>
+                <div class="model-chip" data-model="XGBoost" onclick="selectModel(this)">
+                  <span class="chip-dot" style="background:#10b981"></span>XGBoost
+                </div>
+                <div class="model-chip" data-model="Logistic Regression" onclick="selectModel(this)">
+                  <span class="chip-dot" style="background:#f59e0b"></span>Logistic Reg.
+                </div>
+                <div class="model-chip" data-model="Decision Tree" onclick="selectModel(this)">
+                  <span class="chip-dot" style="background:#ec4899"></span>Decision Tree
+                </div>
+                <div class="model-chip" data-model="SVM" onclick="selectModel(this)">
+                  <span class="chip-dot" style="background:#8b5cf6"></span>SVM
+                </div>
+                <div class="model-chip" data-model="MLP Neural Network" onclick="selectModel(this)">
+                  <span class="chip-dot" style="background:#06b6d4"></span>MLP Neural Net
+                </div>
+              </div>
+            </div>
+
+            <!-- Sliders -->
+            <div class="slider-row">
+              <label>Recency: <strong id="sl-recency-val">30</strong> days</label>
+              <input type="range" id="sl-recency" min="0" max="365" value="30" oninput="syncSlider('recency',this.value)" class="styled-range" />
+            </div>
+            <div class="slider-row">
+              <label>Spend: ₹<strong id="sl-spend-val">15000</strong></label>
+              <input type="range" id="sl-spend" min="100" max="200000" step="100" value="15000" oninput="syncSlider('spend',this.value)" class="styled-range" />
+            </div>
+
+            <button type="submit" class="predict-btn" id="predictBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              Run Prediction
+            </button>
+          </form>
+        </div>
+
+        <!-- Result Panel -->
+        <div class="predict-result-card" id="predictResult">
+          <div class="result-placeholder" id="resultPlaceholder">
+            <div class="placeholder-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg>
+            </div>
+            <p>Fill in customer features and click <strong>Run Prediction</strong> to see the result.</p>
+          </div>
+
+          <div class="result-content hidden" id="resultContent">
+            <div class="result-header">
+              <div class="result-prob-ring" id="probRing">
+                <svg viewBox="0 0 120 120">
+                  <circle class="ring-bg" cx="60" cy="60" r="50" />
+                  <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="50" />
+                </svg>
+                <div class="ring-label">
+                  <span class="ring-pct" id="ringPct">0%</span>
+                  <span class="ring-sub">Purchase<br>Probability</span>
+                </div>
+              </div>
+              <div class="result-meta">
+                <div class="result-badge" id="intentBadge">–</div>
+                <div class="result-seg" id="resultSeg">–</div>
+                <div class="result-model-used" id="resultModelUsed">–</div>
+              </div>
+            </div>
+            <div class="result-action" id="resultAction">
+              <div class="action-icon">💡</div>
+              <div class="action-text" id="actionText">–</div>
+            </div>
+            <div class="result-metrics" id="resultMetrics"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bulk scenarios -->
+      <div class="chart-card" style="margin-top:1.5rem">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Scenario Comparison</div>
+            <div class="chart-subtitle">Compare predictions across pre-set customer profiles</div>
+          </div>
+          <button class="btn-ghost" onclick="runScenarios()">Run All Scenarios</button>
+        </div>
+        <div id="scenariosTable" class="scenarios-table">
+          <div class="table-placeholder">Click "Run All Scenarios" to compare customer profiles.</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ─── PAGE: LIVE MONITOR ─────────────────────── -->
+    <main class="page" id="page-live">
+      <div class="page-header">
+        <h1>Live Monitor <span class="page-badge live">● LIVE</span></h1>
+        <p>Real-time customer purchase event stream & rolling predictions</p>
+      </div>
+
+      <div class="live-controls">
+        <button class="btn-primary" id="liveToggleBtn" onclick="toggleLiveStream()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Start Stream
+        </button>
+        <div class="live-stats">
+          <span>Events: <strong id="liveEventCount">0</strong></span>
+          <span>Avg Prob: <strong id="liveAvgProb">–</strong></span>
+          <span>High Intent: <strong id="liveHighIntent">0</strong></span>
+        </div>
+      </div>
+
+      <div class="charts-row" style="margin-top:1rem">
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <div class="chart-title">Purchase Probability Stream</div>
+            <div class="chart-subtitle">Rolling 30-event window</div>
+          </div>
+          <div class="chart-wrap" style="height:220px"><canvas id="liveLineChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="live-feed-card">
+        <div class="live-feed-header">
+          <div class="chart-title">Event Feed</div>
+          <div class="live-indicator" id="liveIndicator">
+            <span class="pulse-dot"></span> Streaming
+          </div>
+        </div>
+        <div class="live-feed" id="liveFeed">
+          <div class="feed-empty">Stream is paused. Press Start Stream to begin.</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ─── PAGE: REPORTS ──────────────────────────── -->
+    <main class="page" id="page-reports">
+      <div class="page-header">
+        <h1>Reports & Insights</h1>
+        <p>Comprehensive analytics and actionable business intelligence</p>
+      </div>
+
+      <div class="insights-grid">
+        <div class="insight-card highlight">
+          <div class="insight-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">🎯</div>
+          <div class="insight-title">Best Performing Model</div>
+          <div class="insight-value" id="ins-bestModel">SVM (89.9% acc.)</div>
+          <div class="insight-desc">Highest accuracy on customer purchase classification with 99.74% recall.</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon" style="background:linear-gradient(135deg,#10b981,#059669)">💰</div>
+          <div class="insight-title">Avg Customer Value</div>
+          <div class="insight-value" id="ins-avgVal">–</div>
+          <div class="insight-desc">Mean monetary value across all active customer accounts.</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)">⏱️</div>
+          <div class="insight-title">Avg Days Since Purchase</div>
+          <div class="insight-value" id="ins-recency">–</div>
+          <div class="insight-desc">Average recency — lower is better for purchase probability.</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon" style="background:linear-gradient(135deg,#ec4899,#db2777)">🔄</div>
+          <div class="insight-title">Customer Repeat Rate</div>
+          <div class="insight-value" id="ins-freq">–</div>
+          <div class="insight-desc">Average purchase frequency indicating customer loyalty.</div>
+        </div>
+      </div>
+
+      <!-- Model Performance Table -->
+      <div class="chart-card" style="margin-top:1.5rem">
+        <div class="chart-header">
+          <div class="chart-title">Full Model Performance Report</div>
+          <div class="chart-subtitle">All metrics across all 6 trained models</div>
+        </div>
+        <div class="table-wrapper">
+          <table class="perf-table" id="perfTable">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Accuracy</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1 Score</th>
+                <th>AUC-ROC</th>
+                <th>Scaling</th>
+                <th>Rating</th>
+              </tr>
+            </thead>
+            <tbody id="perfTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-row" style="margin-top:1.5rem">
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">F1 Score Comparison</div></div>
+          <div class="chart-wrap" style="height:260px"><canvas id="f1Chart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">AUC-ROC Comparison</div></div>
+          <div class="chart-wrap" style="height:260px"><canvas id="aucChart"></canvas></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ─── PAGE: MODEL COMPARISON ─────────────────── -->
+    <main class="page" id="page-models">
+      <div class="page-header">
+        <h1>Model Comparison</h1>
+        <p>Side-by-side performance evaluation of all 6 ML models</p>
+      </div>
+
+      <div class="model-cards-grid" id="modelCardsGrid">
+        <!-- Injected by JS -->
+      </div>
+
+      <div class="charts-row" style="margin-top:1.5rem">
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <div class="chart-title">Multi-Metric Radar — All Models</div>
+            <div class="chart-subtitle">Accuracy · Precision · Recall · F1 · AUC-ROC</div>
+          </div>
+          <div class="chart-wrap" style="height:380px"><canvas id="modelRadar"></canvas></div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <div class="chart-title">Precision–Recall Tradeoff</div>
+            <div class="chart-subtitle">Bubble size = AUC-ROC score</div>
+          </div>
+          <div class="chart-wrap" style="height:300px"><canvas id="prBubble"></canvas></div>
+        </div>
+      </div>
+    </main>
+
+  </div><!-- /main-wrapper -->
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

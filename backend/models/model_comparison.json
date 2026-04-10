@@ -1,0 +1,50 @@
+{
+  "Random Forest": {
+    "accuracy": 88.86,
+    "precision": 86.87,
+    "recall": 94.79,
+    "f1": 90.66,
+    "auc_roc": 96.26,
+    "needs_scaling": false
+  },
+  "XGBoost": {
+    "accuracy": 88.11,
+    "precision": 88.78,
+    "recall": 90.62,
+    "f1": 89.69,
+    "auc_roc": 96.03,
+    "needs_scaling": false
+  },
+  "Logistic Regression": {
+    "accuracy": 86.63,
+    "precision": 86.39,
+    "recall": 90.89,
+    "f1": 88.58,
+    "auc_roc": 89.57,
+    "needs_scaling": true
+  },
+  "Decision Tree": {
+    "accuracy": 87.96,
+    "precision": 87.22,
+    "recall": 92.45,
+    "f1": 89.76,
+    "auc_roc": 94.13,
+    "needs_scaling": false
+  },
+  "SVM": {
+    "accuracy": 89.9,
+    "precision": 85.11,
+    "recall": 99.74,
+    "f1": 91.85,
+    "auc_roc": 95.63,
+    "needs_scaling": true
+  },
+  "MLP Neural Network": {
+    "accuracy": 88.56,
+    "precision": 83.59,
+    "recall": 99.48,
+    "f1": 90.84,
+    "auc_roc": 87.62,
+    "needs_scaling": true
+  }
+}
