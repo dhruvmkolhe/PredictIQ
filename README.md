@@ -1,4 +1,4 @@
-# PredictIQ - Customer Insight & Prediction Dashboard
+# PredictIQ - Customer Insight & Prediction Dashboard - Deprecated 
 
 PredictIQ is a full-stack machine learning application designed to provide real-time customer analytics and predictions. It leverages various machine learning models to analyze customer behavior, churn probability, and segmentation.
 
